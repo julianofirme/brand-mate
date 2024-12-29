@@ -4,7 +4,7 @@ import { OllamaEmbeddings, ChatOllama } from "@langchain/ollama";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { LangChainAdapter } from 'ai';
-import { brandingPrinciples, brandingPrompt, brandingQuestions } from './branding-knowledge';
+import { brandingKnowledge, brandingPrompt } from './branding-knowledge';
 
 export const loadAndSplitTheDocs = async (file_path: string) => {
   if (typeof window !== 'undefined') {
@@ -60,10 +60,7 @@ export const generatePrompt = async (searches: any[], question: string) => {
     ${brandingPrompt}
 
     CONHECIMENTO BASE SOBRE BRANDING:
-    ${brandingPrinciples}
-
-    PERGUNTAS-CHAVE A CONSIDERAR:
-    ${brandingQuestions.join('\n')}
+    ${brandingKnowledge}
 
     CONTEXTO DO DOCUMENTO:
     ${context}

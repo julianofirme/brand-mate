@@ -1,53 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/db'
-import { chats, messages } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { vectorSearch, generatePrompt, generateOutput } from '@/lib/pdf-processing'
-import crypto from 'crypto'
+import { ChatOllama } from '@langchain/community/chat_models/ollama'
+import { AIMessage, HumanMessage } from '@langchain/core/messages'
+
+const model = new ChatOllama({
+  baseUrl: "http://localhost:11434",
+  model: "llama2",
+})
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages: chatMessages, chatId } = await req.json()
-    
-    if (!chatId) {
-      return NextResponse.json({ error: 'No chat ID provided' }, { status: 400 })
-    }
+    const { messages } = await req.json()
 
-    // Get chat from database
-    const chat = db.select().from(chats).where(eq(chats.id, chatId)).get()
+    const chatHistory = messages.map((msg: { role: string; content: string }) =>
+      msg.role === 'user' ? new HumanMessage(msg.content) : new AIMessage(msg.content)
+    )
 
-    if (!chat) {
-      return NextResponse.json({ error: 'Chat not found' }, { status: 404 })
-    }
-    
-    const question = chatMessages[chatMessages.length - 1].content
+    const response = await model.call(chatHistory)
 
-    // Save user message
-    const userMessageId = crypto.randomUUID()
-    await db.insert(messages).values({
-      id: userMessageId,
-      chatId,
-      content: question,
-      role: 'user',
-    })
-
-    // Get context and generate response
-    const searches = await vectorSearch(chatId, question)
-    const prompt = await generatePrompt(searches, question)
-    const response = await generateOutput(prompt)
-
-    // Save assistant message
-    const assistantMessageId = crypto.randomUUID()
-    await db.insert(messages).values({
-      id: assistantMessageId,
-      chatId,
-      content: String(response),
-      role: 'assistant',
-    })
-
-    return response    
+    return NextResponse.json({ response: response.content })
   } catch (error) {
     console.error('Error in chat:', error)
     return NextResponse.json({ error: 'Error in chat' }, { status: 500 })
   }
 }
+

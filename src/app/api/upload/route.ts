@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { loadAndSplitTheDocs } from '@/lib/pdf-processing'
 import path from 'path'
 import fs from 'fs/promises'
-import crypto from 'crypto'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     await fs.mkdir(path.dirname(tempFilePath), { recursive: true })
     await fs.writeFile(tempFilePath, buffer)
 
-    const sessionId = crypto.randomUUID()
+    const sessionId = uuidv4()
     await loadAndSplitTheDocs(tempFilePath)
 
     await fs.unlink(tempFilePath)
