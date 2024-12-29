@@ -3,6 +3,8 @@ import { brandingKnowledge, brandingPrompt } from "./branding-knowledge";
 import { groqClient } from "./groq";
 import { searchVectorDB } from "./vector-store";
 import { Document } from "@langchain/core/documents";
+import { generateText } from "ai";
+import { groq } from "@ai-sdk/groq";
 
 export { searchVectorDB };
 
@@ -44,7 +46,7 @@ export const generatePrompt = async (contextDocs: Document[], question: string) 
 }
 
 export const generateOutput = async (prompt: string) => {
-  const chatCompletion = await groqClient.chat.completions.create({
+  const chatCompletion = await generateText({
     messages: [
       { 
         role: 'system', 
@@ -55,10 +57,9 @@ export const generateOutput = async (prompt: string) => {
         content: prompt 
       }
     ],
-    model: 'llama-3.3-70b-versatile',
+    model: groq('llama-3.3-70b-versatile'),
     temperature: 0.7,
-    max_tokens: 2000,
   });
 
-  return chatCompletion.choices[0].message;
+  return chatCompletion.text;
 }

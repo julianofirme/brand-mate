@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useChat } from 'ai/react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -19,12 +20,16 @@ const suggestedQuestions = [
 interface ChatInterfaceProps {
   isOpen: boolean;
   onClose: () => void;
+  businessId?: string;
 }
 
-export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function ChatInterface({ isOpen, onClose, businessId }: ChatInterfaceProps) {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+    body: {
+      businessId
+    }
+  })
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -33,38 +38,8 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
 
   useEffect(scrollToBottom, [messages])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim()) return
-
-    const newMessage: Message = { role: 'user', content: input }
-    setMessages(prev => [...prev, newMessage])
-    setInput('')
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, newMessage] }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
-      } else {
-        throw new Error('Falha ao obter resposta do chat')
-      }
-    } catch (error) {
-      console.error('Erro:', error)
-      alert('Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleSuggestedQuestion = (question: string) => {
-    setInput(question)
+    handleInputChange({ target: { value: question } } as any)
   }
 
   return (
@@ -83,13 +58,19 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
             className="bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-2xl"
           >
             <div className="flex justify-between items-center p-4 bg-indigo-600 text-white">
-              <h2 className="text-xl font-bold">Chat com IA</h2>
+              <h2 className="text-xl font-bold">Chat com IA{businessId ? ' - Assistente da Marca' : ''}</h2>
               <button onClick={onClose} className="text-white hover:text-gray-200">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <div className="h-[500px] flex flex-col">
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.length === 0 && (
+                  <div className="text-center text-gray-500 mt-4">
+                    <p>Olá! Sou seu assistente de marketing digital{businessId ? ' especializado na sua marca' : ''}.</p>
+                    <p>Como posso ajudar você hoje?</p>
+                  </div>
+                )}
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -111,13 +92,13 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
                   <input
                     type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputChange}
                     placeholder="Digite sua pergunta..."
                     className="flex-1 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <motion.button
                     type="submit"
-                    disabled={loading}
+                    disabled={isLoading}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
@@ -144,4 +125,3 @@ export default function ChatInterface({ isOpen, onClose }: ChatInterfaceProps) {
     </AnimatePresence>
   )
 }
-

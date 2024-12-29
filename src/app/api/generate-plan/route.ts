@@ -34,12 +34,12 @@ async function generateMarketingPlan(businessData: any) {
 
       const response = await generateOutput(formattedPrompt);
       
-      if (!response?.content) {
+      if (!response) {
         throw new Error(`Failed to generate content for ${section}`);
       }
 
       // Split by strategy headers and remove empty entries
-      const topics = String(response.content)
+      const topics = String(response)
         .split(/(?=\*\*Estratégia \d+:)/)
         .filter(topic => topic.trim().length > 0)
         .map(topic => topic.trim());
