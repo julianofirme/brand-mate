@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { CheckCircleIcon, ArrowDownTrayIcon, ClipboardIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
 import ChatInterface from '@/components/ChatInterface'
+import ReactMarkdown from 'react-markdown'
 
 interface PlanResult {
   resumoNegocio: string
@@ -63,15 +64,30 @@ export default function ResultsPage() {
 
   const renderSection = (title: string, items: string[]) => (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-      <ul className="space-y-2">
+      <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><CheckCircleIcon className="h-5 w-5 text-green-500 mr-1 flex-shrink-0"/> {title}</h3>
+      <div className="space-y-6">
         {items.map((item, index) => (
-          <li key={index} className="flex items-start">
-            <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-            <span>{item}</span>
-          </li>
+          <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+            <ReactMarkdown
+              components={{
+                h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-3" {...props} />,
+                h2: ({ node, ...props }) => <h2 className="text-lg font-semibold mb-2" {...props} />,
+                h3: ({ node, ...props }) => <h3 className="text-md font-semibold mb-2" {...props} />,
+                strong: ({ node, ...props }) => <strong className="font-semibold text-indigo-600" {...props} />,
+                p: ({ node, ...props }) => <p className="mb-3 text-gray-700" {...props} />,
+                ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                li: ({ node, ...props }) => <li className="text-gray-700" {...props} />,
+                a: ({ node, ...props }) => (
+                  <a className="text-indigo-600 hover:text-indigo-800 underline" {...props} />
+                ),
+              }}
+              className="prose max-w-none"
+            >
+              {item}
+            </ReactMarkdown>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 
@@ -137,4 +153,3 @@ export default function ResultsPage() {
     </div>
   )
 }
-
