@@ -1,7 +1,6 @@
 import { PromptTemplate } from "@langchain/core/prompts";
-import { ChatOllama } from "@langchain/ollama";
-import { LangChainAdapter } from "ai";
 import { brandingKnowledge, brandingPrompt } from "./branding-knowledge";
+import { groqClient } from "./groq";
 
 export const generatePrompt = async (searches: any[], question: string) => {
   let context = "";
@@ -38,11 +37,10 @@ export const generatePrompt = async (searches: any[], question: string) => {
 }
 
 export const generateOutput = async (prompt: string) => {
-  const ollamaLlm = new ChatOllama({
-    baseUrl: "http://localhost:11434", // Default value
-    model: "llama3.2", // Default value
+  const chatCompletion = await groqClient.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }, { role: 'system', content: brandingPrompt }],
+    model: 'llama-3.3-70b-versatile',
   });
 
-  const response = await ollamaLlm.invoke(prompt);
-  return response;
+  return chatCompletion.choices[0].message
 }
