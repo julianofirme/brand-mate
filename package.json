@@ -14,7 +14,11 @@
     "@heroicons/react": "^2.2.0",
     "@langchain/community": "^0.3.20",
     "@langchain/core": "^0.3.26",
+    "@langchain/groq": "^0.0.1",
     "@langchain/ollama": "^0.1.0",
+    "@langchain/openai": "^0.3.16",
+    "@langchain/qdrant": "^0.0.1",
+    "@qdrant/js-client-rest": "^1.12.0",
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.1",
@@ -23,8 +27,6 @@
     "@xenova/transformers": "^2.17.2",
     "ai": "^4.0.22",
     "better-sqlite3": "^11.7.0",
-    "chromadb": "^1.9.4",
-    "chromadb-default-embed": "^2.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cohere-ai": "^7.15.0",
@@ -32,7 +34,7 @@
     "framer-motion": "^11.15.0",
     "fs": "^0.0.1-security",
     "groq-sdk": "^0.9.1",
-    "langchain": "^0.3.2",
+    "langchain": "^0.3.8",
     "lucide-react": "^0.469.0",
     "next": "15.1.2",
     "next-themes": "^0.4.4",
@@ -58,5 +60,6 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@9.13.2+sha512.88c9c3864450350e65a33587ab801acf946d7c814ed1134da4a924f6df5a2120fd36b46aab68f7cd1d413149112d53c7db3a4136624cfd00ff1846a0c6cef48a"
 }

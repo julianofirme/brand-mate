@@ -3,15 +3,22 @@ import { db } from '@/db'
 import { plans } from '@/db/schema'
 import { v4 as uuidv4 } from 'uuid'
 import { eq } from 'drizzle-orm'
-import { generateOutput, generatePrompt } from '@/lib/generate-plan'
+import { generateOutput, generatePrompt, searchVectorDB } from '@/lib/generate-plan'
+import { Document } from 'langchain/document'
 
 async function generateMarketingPlan(businessData: any) {
   const resumo = `${businessData.negocio} é uma empresa no segmento de ${businessData.segmento} focada em ${businessData.publicoAlvo}. Seu objetivo principal é ${businessData.objetivos}, com um orçamento mensal de ${businessData.orcamento}.`
 
-  // Helper function to process AI responses
+  // Helper function to process AI responses with vector search context
   const processAIResponse = async (section: string, prompt: string) => {
     try {
-      const formattedPrompt = `Para ${businessData.negocio}, gere exatamente 4 estratégias de ${section}. 
+      // Get relevant context from vector store if businessId exists
+      let contextDocs: Document[] = [];
+      if (businessData.businessId) {
+        contextDocs = await searchVectorDB(businessData.businessId, `${section} ${businessData.segmento} ${businessData.publicoAlvo}`);
+      }
+
+      const formattedPrompt = await generatePrompt(contextDocs, `Para ${businessData.negocio}, gere exatamente 4 estratégias de ${section}. 
       Para cada estratégia, use o formato exato:
       
       **Estratégia 1:** [título da estratégia]
@@ -22,8 +29,8 @@ async function generateMarketingPlan(businessData: any) {
       
       E assim por diante.
       
-      Contexto:
-      ${prompt}`;
+      Informações importantes:
+      ${prompt}`);
 
       const response = await generateOutput(formattedPrompt);
       

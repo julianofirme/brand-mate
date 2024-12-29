@@ -25,6 +25,7 @@ export default function MultiStepForm() {
     objetivos: '',
     orcamento: '',
     localizacao: '',
+    pdfUpload: undefined
   })
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -54,11 +55,34 @@ export default function MultiStepForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
     try {
+      let pdfContext = '';
+      let businessId = '';
+      
+      // Process PDF if exists
+      if (pdfFile) {
+        const formDataWithPdf = new FormData()
+        formDataWithPdf.append('pdf', pdfFile)
+        
+        const pdfResponse = await fetch('/api/process-pdf', {
+          method: 'POST',
+          body: formDataWithPdf,
+        });
+        
+        if (pdfResponse.ok) {
+          const { text, businessId: id } = await pdfResponse.json();
+          pdfContext = text;
+          businessId = id;
+        }
+      }
+
       const planData = {
         title: formData.negocio,
         businessData: {
-          ...formData, 
+          ...formData,
+          pdfContext,
+          businessId
         }
       }
   
@@ -72,18 +96,6 @@ export default function MultiStepForm() {
   
       if (response.ok) {
         const result = await response.json()
-        
-        if (pdfFile) {
-          const formDataWithPdf = new FormData()
-          formDataWithPdf.append('pdf', pdfFile)
-          formDataWithPdf.append('planId', result.id)
-          
-          await fetch('/api/upload-pdf', {
-            method: 'POST',
-            body: formDataWithPdf,
-          })
-        }
-  
         router.push(`/results?id=${result.id}`)
       } else {
         throw new Error('Falha ao gerar o plano de marketing')
@@ -122,7 +134,14 @@ export default function MultiStepForm() {
             ))}
           </div>
         </div>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          if (step === formFields.length - 1) {
+            handleSubmit(e);
+          } else {
+            nextStep();
+          }
+        }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -235,4 +254,3 @@ export default function MultiStepForm() {
     </div>
   )
 }
-

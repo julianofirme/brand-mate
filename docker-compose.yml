@@ -1,7 +1,13 @@
 version: '3.7'
 
 services:
-  chroma:
-    image: chromadb/chroma
+  qdrant:
+    image: qdrant/qdrant
     ports:
-      - '8000:8000'
+      - '6333:6333'
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+volumes:
+  qdrant_storage:
+    driver: local
