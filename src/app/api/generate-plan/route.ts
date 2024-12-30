@@ -3,8 +3,9 @@ import { db } from '@/db'
 import { plans } from '@/db/schema'
 import { v4 as uuidv4 } from 'uuid'
 import { eq } from 'drizzle-orm'
-import { generateOutput, generatePrompt, searchVectorDB } from '@/lib/generate-plan'
+import { generateOutput, generatePrompt } from '@/lib/generate-plan'
 import { Document } from 'langchain/document'
+import { searchVectorDB } from '@/lib/vector-store'
 
 async function generateMarketingPlan(businessData: any) {
   const resumo = `${businessData.negocio} é uma empresa no segmento de ${businessData.segmento} focada em ${businessData.publicoAlvo}. Seu objetivo principal é ${businessData.objetivos}, com um orçamento mensal de ${businessData.orcamento}.`

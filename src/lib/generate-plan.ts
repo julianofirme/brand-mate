@@ -1,5 +1,4 @@
 import { PromptTemplate } from "@langchain/core/prompts";
-import { searchVectorDB } from "./vector-store";
 import { Document } from "@langchain/core/documents";
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
@@ -7,8 +6,6 @@ import {
   BASE_SYSTEM_PROMPT,
   EXPERTISE_FRAMEWORK,
 } from "@/lib/prompt-templates";
-
-export { searchVectorDB };
 
 export const generatePrompt = async (contextDocs: Document[], question: string) => {
   // Format the context from vector store documents
