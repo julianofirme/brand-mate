@@ -7,7 +7,7 @@ A modern web application designed for collaborative branding discussions, enabli
 - PDF document processing and chunking
 - Vector-based semantic search using ChromaDB
 - Interactive Chat Interface
-- AI-Powered Document Analysis
+- AI-Powered Document Analysis with Llama 3.3 70B
 - Efficient document chunking with RecursiveCharacterTextSplitter
 - Context-Aware Responses
 - Real-time Processing
@@ -53,7 +53,7 @@ The application will be available at `http://localhost:3000`
 2. **Document Processing**: The application splits the PDF into manageable chunks using LangChain's text splitter
 3. **Vector Storage**: Document chunks are embedded and stored in Qdrant for efficient retrieval
 4. **Chat Interface**: Users can ask questions about the uploaded document
-5. **AI Processing**: The application uses Ollama to generate context-aware responses based on the document content
+5. **AI Processing**: The application uses Llama 3.3 70B to generate context-aware responses based on the document content
 
 ## 🛠 Tech Stack
 
@@ -64,13 +64,6 @@ The application will be available at `http://localhost:3000`
   - LangChain for document processing
   - Qdrant for vector storage
 
-## 🔧 Project Structure
-
-- `/src/app/page.tsx` - Main chat interface
-- `/src/app/api/chat/route.ts` - Chat API endpoint
-- `/src/app/api/upload/route.ts` - PDF upload handling
-- `/src/lib/pdf-processing.ts` - PDF processing utilities
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License
