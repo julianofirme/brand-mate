@@ -18,6 +18,8 @@ const formFields = [
 export default function MultiStepForm() {
   const router = useRouter()
   const [step, setStep] = useState(0)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [businessId, setBusinessId] = useState('')
   const [formData, setFormData] = useState({
     negocio: '',
     segmento: '',
@@ -35,9 +37,29 @@ export default function MultiStepForm() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0])
+      const file = e.target.files[0]
+      setPdfFile(file)
+      
+      // Process PDF immediately after upload
+      try {
+        const formDataWithPdf = new FormData()
+        formDataWithPdf.append('pdf', file)
+        
+        const pdfResponse = await fetch('/api/process-pdf', {
+          method: 'POST',
+          body: formDataWithPdf,
+        });
+        
+        if (pdfResponse.ok) {
+          const { businessId: id } = await pdfResponse.json();
+          setBusinessId(id);
+        }
+      } catch (error) {
+        console.error('Error processing PDF:', error);
+        alert('Ocorreu um erro ao processar o PDF. Por favor, tente novamente.');
+      }
     }
   }
 
@@ -53,35 +75,16 @@ export default function MultiStepForm() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const generatePlan = async () => {
+    if (isGenerating) return;
     
     try {
-      let pdfContext = '';
-      let businessId = '';
+      setIsGenerating(true);
       
-      // Process PDF if exists
-      if (pdfFile) {
-        const formDataWithPdf = new FormData()
-        formDataWithPdf.append('pdf', pdfFile)
-        
-        const pdfResponse = await fetch('/api/process-pdf', {
-          method: 'POST',
-          body: formDataWithPdf,
-        });
-        
-        if (pdfResponse.ok) {
-          const { text, businessId: id } = await pdfResponse.json();
-          pdfContext = text;
-          businessId = id;
-        }
-      }
-
       const planData = {
         title: formData.negocio,
         businessData: {
           ...formData,
-          pdfContext,
           businessId
         }
       }
@@ -103,6 +106,8 @@ export default function MultiStepForm() {
     } catch (error) {
       console.error('Erro:', error)
       alert('Ocorreu um erro ao gerar o plano de marketing. Por favor, tente novamente.')
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -136,9 +141,7 @@ export default function MultiStepForm() {
         </div>
         <form onSubmit={(e) => {
           e.preventDefault();
-          if (step === formFields.length - 1) {
-            handleSubmit(e);
-          } else {
+          if (step < formFields.length - 1) {
             nextStep();
           }
         }}>
@@ -172,22 +175,22 @@ export default function MultiStepForm() {
                       <div className="flex text-sm text-gray-600">
                         <label
                           htmlFor="file-upload"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                          className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500"
                         >
-                          <span>Upload a file</span>
+                          <span>Upload um arquivo</span>
                           <input
                             id="file-upload"
                             name="file-upload"
                             type="file"
                             className="sr-only"
                             accept=".pdf"
-                            onChange={handleFileChange}
                             ref={fileInputRef}
+                            onChange={handleFileChange}
                           />
                         </label>
-                        <p className="pl-1">or drag and drop</p>
+                        <p className="pl-1">ou arraste e solte</p>
                       </div>
-                      <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                      <p className="text-xs text-gray-500">PDF até 10MB</p>
                     </div>
                   </div>
                 ) : (
@@ -204,50 +207,41 @@ export default function MultiStepForm() {
                 )}
               </div>
               {getFeedbackMessage() && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-indigo-600 mt-2"
-                >
+                <div className="text-sm text-indigo-600 mb-4">
                   {getFeedbackMessage()}
-                </motion.p>
+                </div>
               )}
             </motion.div>
           </AnimatePresence>
           <div className="flex justify-between mt-8">
-            <motion.button
-              type="button"
-              onClick={prevStep}
-              disabled={step === 0}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition duration-150 ease-in-out"
-            >
-              <ChevronLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-              Anterior
-            </motion.button>
-            {step === formFields.length - 1 ? (
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-              >
-                Gerar Plano
-                <ChevronRightIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
-              </motion.button>
-            ) : (
-              <motion.button
+            {step > 0 && (
+              <button
                 type="button"
-                onClick={nextStep}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                onClick={prevStep}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
-                Próximo
-                <ChevronRightIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
-              </motion.button>
+                Anterior
+              </button>
             )}
+            <div className="ml-auto">
+              {step < formFields.length - 1 ? (
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+                >
+                  Próximo
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={generatePlan}
+                  disabled={isGenerating}
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? 'Gerando Plano...' : 'Gerar Plano de Marketing'}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>

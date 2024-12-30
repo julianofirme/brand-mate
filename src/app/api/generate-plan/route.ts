@@ -112,40 +112,6 @@ async function generateMarketingPlan(businessData: any) {
       - Estabeleça prazos claros para cada KPI`)
   ]);
 
-  // Default content in case AI generation fails
-  const defaultContent = {
-    social: [
-      `Criar conteúdo relevante para ${businessData.publicoAlvo} no Instagram e LinkedIn`,
-      `Desenvolver campanhas específicas para o segmento de ${businessData.segmento}`,
-      'Estabelecer calendário de postagens consistente',
-      'Engajar com a audiência através de stories e posts interativos'
-    ],
-    pagas: [
-      `Investir ${businessData.orcamento} em anúncios segmentados`,
-      'Criar campanhas de remarketing para visitantes do site',
-      'Desenvolver anúncios A/B para otimizar conversão',
-      'Focar em palavras-chave relevantes para SEO'
-    ],
-    content: [
-      `Criar blog posts focados em ${businessData.segmento}`,
-      'Desenvolver ebooks e materiais ricos',
-      'Produzir vídeos explicativos',
-      'Estabelecer autoridade no setor através de conteúdo especializado'
-    ],
-    email: [
-      'Criar sequência de nutrição para novos leads',
-      'Desenvolver newsletter mensal',
-      'Segmentar base de emails por interesse',
-      'Automatizar campanhas de reengajamento'
-    ],
-    kpisDefault: [
-      `Aumentar vendas em 30% em 6 meses`,
-      'Atingir 10.000 seguidores nas redes sociais',
-      'Alcançar taxa de conversão de 3% nos anúncios',
-      'Obter 1.000 novos leads qualificados por mês'
-    ]
-  };
-
   return {
     resumoNegocio: resumo,
     socialMedia: socialMedia,
@@ -196,7 +162,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(null)
     }
 
-    // Parse o conteúdo e retorna no formato esperado pelo frontend
     const content = JSON.parse(plan[0].content)
     return NextResponse.json({
       id: plan[0].id,

@@ -28,11 +28,7 @@ export async function POST(req: NextRequest) {
     // Store documents in vector database
     await storeDocumentInVectorDB(docs, businessId);
 
-    // Extract and combine text from all pages
-    const text = docs.map(doc => doc.pageContent).join('\n')
-
     return NextResponse.json({ 
-      text,
       businessId // Return the businessId to be used in plan generation
     })
   } catch (error) {
