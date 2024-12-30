@@ -55,7 +55,7 @@ export default function ChatInterface({ isOpen, onClose, businessId }: ChatInter
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-2xl"
+            className="bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-[90%] h-[90%]"
           >
             <div className="flex justify-between items-center p-4 bg-indigo-600 text-white">
               <h2 className="text-xl font-bold">Chat com IA{businessId ? ' - Assistente da Marca' : ''}</h2>
@@ -63,7 +63,7 @@ export default function ChatInterface({ isOpen, onClose, businessId }: ChatInter
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
-            <div className="h-[500px] flex flex-col">
+            <div className="h-[90%] flex flex-col">
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 && (
                   <div className="text-center text-gray-500 mt-4">

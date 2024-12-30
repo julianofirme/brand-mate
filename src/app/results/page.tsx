@@ -21,10 +21,10 @@ export default function ResultsPage() {
   const [planResult, setPlanResult] = useState<PlanResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const id = searchParams.get('id')
 
   useEffect(() => {
     const fetchResults = async () => {
-      const id = searchParams.get('id')
       if (id) {
         try {
           const response = await fetch(`/api/get-plan?id=${id}`)
@@ -149,7 +149,7 @@ export default function ResultsPage() {
           Chat com IA
         </motion.button>
       </div>
-      <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} businessId={id!} />
     </div>
   )
 }

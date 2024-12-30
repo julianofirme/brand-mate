@@ -1,10 +1,12 @@
 import { PromptTemplate } from "@langchain/core/prompts";
-import { brandingKnowledge, brandingPrompt } from "./branding-knowledge";
-import { groqClient } from "./groq";
 import { searchVectorDB } from "./vector-store";
 import { Document } from "@langchain/core/documents";
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
+import {
+  BASE_SYSTEM_PROMPT,
+  EXPERTISE_FRAMEWORK,
+} from "@/lib/prompt-templates";
 
 export { searchVectorDB };
 
@@ -15,10 +17,10 @@ export const generatePrompt = async (contextDocs: Document[], question: string) 
     .join("\n\n");
 
   const prompt = PromptTemplate.fromTemplate(`
-    ${brandingPrompt}
+    ${BASE_SYSTEM_PROMPT}
 
     CONHECIMENTO BASE SOBRE BRANDING:
-    ${brandingKnowledge}
+    ${EXPERTISE_FRAMEWORK}
 
     ${context ? `CONTEXTO ESPECÍFICO DA MARCA:
     ${context}` : ''}
@@ -45,12 +47,14 @@ export const generatePrompt = async (contextDocs: Document[], question: string) 
   return formattedPrompt;
 }
 
+const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${EXPERTISE_FRAMEWORK}`;
+
 export const generateOutput = async (prompt: string) => {
   const chatCompletion = await generateText({
     messages: [
       { 
         role: 'system', 
-        content: brandingPrompt 
+        content: systemPrompt 
       },
       { 
         role: 'user', 
