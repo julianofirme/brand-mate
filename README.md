@@ -1,6 +1,6 @@
-# RAG Chat
+# BrandMate
 
-A modern web application that enables users to have interactive conversations about PDF documents using AI. Built with Next.js, TypeScript, and integrated with Ollama for AI capabilities.
+A modern web application designed for collaborative branding discussions, enabling users to upload and interact with PDF documents in real-time using AI. Built with Next.js, TypeScript, and integrated with Groq API for intelligent, context-aware branding insights. BrandMate streamlines branding strategies by automatically extracting key details from documents and facilitating focused, interactive conversations.
 
 ## 🌟 Features
 
@@ -17,15 +17,15 @@ A modern web application that enables users to have interactive conversations ab
 ### Prerequisites
 
 - Node.js
-- Docker (for ChromaDB)
-- [Ollama](https://ollama.com/) installed locally
+- Docker (for Qdrant)
+- [Groq](groq.com) API key
 
 ### Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/julianofirme/rag-chat.git
-cd rag-chat
+git clone https://github.com/julianofirme/brand-mate.git
+cd brand-mate
 ```
 
 2. Install dependencies:
@@ -33,12 +33,9 @@ cd rag-chat
 npm install
 ```
 
-3. Make sure Ollama is running locally on port 11434
-```bash
-ollama run llama3.2
-```
+3. Make sure GROQ_API_KEY is defined
 
-4. Start ChromaDB using Docker:
+4. Start Qdrant using Docker:
 ```bash
 docker-compose up -d
 ```
@@ -52,9 +49,9 @@ The application will be available at `http://localhost:3000`
 
 ## How It Works
 
-1. **PDF Upload**: Users can upload PDF documents through the interface
+1. **Brand information**: Users fills out a form about the brand
 2. **Document Processing**: The application splits the PDF into manageable chunks using LangChain's text splitter
-3. **Vector Storage**: Document chunks are embedded and stored in ChromaDB for efficient retrieval
+3. **Vector Storage**: Document chunks are embedded and stored in Qdrant for efficient retrieval
 4. **Chat Interface**: Users can ask questions about the uploaded document
 5. **AI Processing**: The application uses Ollama to generate context-aware responses based on the document content
 
@@ -63,9 +60,9 @@ The application will be available at `http://localhost:3000`
 - **Frontend**: Next.js
 - **UI Components**: Shadcn/ui
 - **AI/ML**: 
-  - Ollama for LLM capabilities
+  - Groq API for LLM capabilities
   - LangChain for document processing
-  - ChromaDB for vector storage
+  - Qdrant for vector storage
 
 ## 🔧 Project Structure
 
