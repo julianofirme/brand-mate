@@ -114,7 +114,6 @@ function getCurrentQuestion(messages: VercelMessage[]): string {
 export async function POST(req: Request) {
   try {
     const {messages, businessId} = await req.json();
-    console.log("🚀 ~ businessId:", businessId)
 
     // Validate input
     if (!Array.isArray(messages) || messages.length === 0) {
